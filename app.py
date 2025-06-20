@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify, send_file, render_template_string
 import json
+from flask_cors import CORS
 from datetime import datetime
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 LOG_FILE = "log.txt"
 
