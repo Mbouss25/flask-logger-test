@@ -5,10 +5,8 @@ import os
 
 app = Flask(__name__)
 
-# 🔐 Log file path
 LOG_FILE = "log.txt"
 
-# 🟢 Page HTML avec bouton de téléchargement
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="fr">
@@ -29,12 +27,10 @@ HTML_PAGE = """
 </html>
 """
 
-# ✅ Affiche la page avec le bouton
 @app.route("/")
 def index():
     return render_template_string(HTML_PAGE)
 
-# ✅ Route de réception des données
 @app.route("/log", methods=["POST"])
 def receive_log():
     data = request.json
@@ -46,7 +42,6 @@ def receive_log():
 
     return jsonify({"status": "success"}), 200
 
-# ✅ Route de téléchargement du fichier log
 @app.route("/download-log", methods=["GET"])
 def download_log():
     if os.path.exists(LOG_FILE):
@@ -54,6 +49,7 @@ def download_log():
     else:
         return "Fichier log introuvable", 404
 
-# ✅ Lancer l’app localement
+# ✅ Pour Railway : utilise le port défini dans l'environnement
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Railway définit PORT automatiquement
+    app.run(host="0.0.0.0", port=port)
