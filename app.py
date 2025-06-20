@@ -35,12 +35,16 @@ def index():
 
 @app.route("/log", methods=["POST"])
 def receive_log():
-    data = request.json
+    data = request.get_json(force=True)
     data["timestamp"] = datetime.utcnow().isoformat()
 
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False)
-        f.write("\n")
+    # Sécurité : éviter d'écraser le fichier
+    try:
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False)
+            f.write("\n")
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)}), 500
 
     return jsonify({"status": "success"}), 200
 
@@ -51,7 +55,6 @@ def download_log():
     else:
         return "Fichier log introuvable", 404
 
-# ✅ Pour Railway : utilise le port défini dans l'environnement
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Railway définit PORT automatiquement
+    port = int(os.environ.get("PORT", 5000))  # Port Railway
     app.run(host="0.0.0.0", port=port)
