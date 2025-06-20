@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 import json
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def index():
@@ -13,10 +15,7 @@ def index():
 def log_data():
     data = request.get_json()
     if data:
-        # Affichage en live dans Railway Logs
         print("✅ Données reçues :", data)
-        
-        # Sauvegarde dans log.txt
         with open("log.txt", "a") as f:
             f.write(f"{datetime.now().isoformat()} - {json.dumps(data)}\n")
         return jsonify({"status": "OK"}), 200
