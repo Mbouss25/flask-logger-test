@@ -29,13 +29,16 @@ HTML_PAGE = """
 </html>
 """
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
     return render_template_string(HTML_PAGE)
 
 @app.route("/log", methods=["POST"])
 def receive_log():
-    data = request.json
+    data = request.get_json()
+    if not data:
+        return jsonify({"status": "error", "message": "Aucune donnée reçue"}), 400
+
     data["timestamp"] = datetime.utcnow().isoformat()
 
     with open(LOG_FILE, "a", encoding="utf-8") as f:
@@ -51,7 +54,7 @@ def download_log():
     else:
         return "Fichier log introuvable", 404
 
-# ✅ Pour Railway : utilise le port défini dans l'environnement
+# Railway utilisera automatiquement ce port
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Railway définit PORT automatiquement
+    port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
